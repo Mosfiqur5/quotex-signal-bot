@@ -1,0 +1,8 @@
+.env
+venv/
+state.json
+logs/
+signals.csv
+backtest_signals.csv
+__pycache__/
+.pytest_cache/
