@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 import pytest
 
-from signalbot.backtest import run_backtest
+from signalbot.backtest import data_quality, main as backtest_main, run_backtest
 from signalbot.main import (
     cooldown_active,
     load_state,
@@ -153,6 +153,50 @@ def test_backtest_stats_breakeven_and_dollar_profit(monkeypatch):
     assert stats["breakeven_win_rate_pct"] == pytest.approx(55.5555556)
     assert stats["net_profit_usd"] == pytest.approx(-0.2)
     assert [record["result"] for record in records] == ["WIN", "LOSS"]
+
+
+def test_data_quality_percentages():
+    candles = pd.DataFrame(
+        {
+            "high": [1.0, 2.0, 3.0, 4.0],
+            "low": [1.0, 1.0, 3.0, 3.0],
+            "close": [10.0, 10.0, 11.0, 11.0],
+        }
+    )
+
+    quality = data_quality(candles)
+
+    assert quality["flat_candle_pct"] == pytest.approx(50)
+    assert quality["unchanged_close_pct"] == pytest.approx(200 / 3)
+
+
+def test_backtest_main_warns_for_snapshot_quality(
+    monkeypatch, capsys, tmp_path
+):
+    cfg = make_config()
+    candles = pd.DataFrame(
+        {
+            "time": pd.date_range("2024-01-01T00:00:00Z", periods=4, freq="min"),
+            "high": [1.0, 1.0, 1.0, 1.0],
+            "low": [1.0, 1.0, 1.0, 1.0],
+            "close": [1.0, 1.0, 1.0, 1.0],
+        }
+    )
+    monkeypatch.setattr("signalbot.backtest.load_config", lambda: cfg)
+    monkeypatch.setattr(
+        "signalbot.backtest.fetch_candles", lambda *args, **kwargs: candles
+    )
+    monkeypatch.chdir(tmp_path)
+
+    assert backtest_main(["--pair", "EURUSD", "--days", "1"]) == 0
+
+    output = capsys.readouterr().out
+    assert "flat candles 100.00%" in output
+    assert "unchanged closes 100.00%" in output
+    assert (
+        "WARNING: low-quality price data (snapshot prices) — "
+        "this backtest result is NOT reliable."
+    ) in output
 
 
 def test_notifier_posts_telegram_payload_and_prints(monkeypatch, capsys):

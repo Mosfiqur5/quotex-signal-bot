@@ -19,6 +19,21 @@ BACKTEST_COLUMNS = [
 ]
 
 
+def data_quality(candles: pd.DataFrame):
+    if candles.empty:
+        return {"flat_candle_pct": 0.0, "unchanged_close_pct": 0.0}
+
+    flat_candle_pct = candles["high"].eq(candles["low"]).mean() * 100
+    close_diffs = candles["close"].diff().iloc[1:]
+    unchanged_close_pct = (
+        close_diffs.eq(0).sum() / len(close_diffs) * 100 if len(close_diffs) else 0.0
+    )
+    return {
+        "flat_candle_pct": float(flat_candle_pct),
+        "unchanged_close_pct": float(unchanged_close_pct),
+    }
+
+
 def run_backtest(candles: pd.DataFrame, cfg, pair: str):
     if candles.empty:
         raise ValueError("Backtest data is empty.")
@@ -95,10 +110,23 @@ def main(argv=None):
     if candles.empty:
         raise RuntimeError(f"No candles available for {pair}.")
     stats, records = run_backtest(candles, cfg, pair)
+    quality = data_quality(candles)
     print(
         f"Pair: {pair} | Interval: {cfg.interval} | "
         f"Candles: {len(candles)} | Expiry: {cfg.expiry_min} min"
     )
+    print(
+        f"Data quality: flat candles {quality['flat_candle_pct']:.2f}% | "
+        f"unchanged closes {quality['unchanged_close_pct']:.2f}%"
+    )
+    if (
+        quality["flat_candle_pct"] > 50
+        or quality["unchanged_close_pct"] > 30
+    ):
+        print(
+            "WARNING: low-quality price data (snapshot prices) — "
+            "this backtest result is NOT reliable."
+        )
     print(f"Signals: {stats['signals']}")
     print(
         f"Wins: {stats['wins']} | Losses: {stats['losses']} | Draws: {stats['draws']}"

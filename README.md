@@ -6,6 +6,8 @@ Ei bot sudhu public market data dekhe Telegram ba console-e signal pathay. Eta k
 
 Profit-er kono guarantee nei; binary options khub high risk ebong puro taka harate paren. 80% payout-e break-even win rate pray 55.6%. **Quotex OTC pair support nei**—OTC price sudhu Quotex-er vitore thake. Ekhankar real-market price-er sathe Quotex price ektu alada hote pare. Forex weekend-e bondho thake. Ei signal sudhu information, financial advice na.
 
+Forex data Yahoo theke ashe, eta approximate (1m-e proti minute-e ekta price snapshot); tai forex signal o backtest Binance crypto data-r cheye kom reliable. Forex-er jonno `INTERVAL=5m` ebong `EXPIRY_MIN=5` recommend kori. Data weak hole backtest-e `WARNING` dekhabe.
+
 ## Shuru korun
 
 1. Python 3.10 install korun.
