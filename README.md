@@ -27,7 +27,7 @@ Forex data Yahoo theke ashe, eta approximate (1m-e proti minute-e ekta price sna
 Ubuntu 22.04/24.04 VPS kinun, provider-er web console khulun, tarpor:
 
 ```bash
-git clone <REPO_URL>
+git clone https://github.com/Mosfiqur5/quotex-signal-bot.git
 cd quotex-signal-bot
 sudo bash install.sh
 ```
