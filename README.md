@@ -21,3 +21,23 @@ Forex data Yahoo theke ashe, eta approximate (1m-e proti minute-e ekta price sna
 ## Settings
 
 `.env`-e `PAIRS`, `INTERVAL` (`1m` ba `5m`), `EXPIRY_MIN`, `BB_PERIOD`, `BB_STD`, `RSI_PERIOD`, `RSI_LOW`, `RSI_HIGH`, `COOLDOWN_CANDLES`, `PAYOUT_PCT`, ebong `TIMEZONE` bodlate paren. `EXPIRY_MIN` interval-er gunito hote hobe.
+
+## VPS e chalano
+
+Ubuntu 22.04/24.04 VPS kinun, provider-er web console khulun, tarpor:
+
+```bash
+git clone <REPO_URL>
+cd quotex-signal-bot
+sudo bash install.sh
+```
+
+`.env` na thakle installer Telegram bot token o chat ID chaibe; token screen-e dekhabe na. Bot service chalu hole log dekhun `journalctl -u quotex-signal-bot -f` diye. Bondho/chalu/restart:
+
+```bash
+sudo systemctl stop quotex-signal-bot
+sudo systemctl start quotex-signal-bot
+sudo systemctl restart quotex-signal-bot
+```
+
+Settings bodlate `nano .env` chalan, tarpor `sudo systemctl restart quotex-signal-bot`. Update-er jonno `git pull && sudo systemctl restart quotex-signal-bot` chalan.
