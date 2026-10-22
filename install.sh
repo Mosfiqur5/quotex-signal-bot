@@ -27,6 +27,15 @@ python3 -m venv "$APP_DIR/venv"
 "$APP_DIR/venv/bin/pip" install -r "$APP_DIR/requirements.txt"
 
 if [[ ! -f "$APP_DIR/.env" ]]; then
+    if [[ -z "${TELEGRAM_BOT_TOKEN:-}" && ! -t 0 ]]; then
+        printf 'Error: set TELEGRAM_BOT_TOKEN or run this installer in an interactive console.\n' >&2
+        exit 1
+    fi
+    if [[ -z "${TELEGRAM_CHAT_ID:-}" && ! -t 0 ]]; then
+        printf 'Error: set TELEGRAM_CHAT_ID or run this installer in an interactive console.\n' >&2
+        exit 1
+    fi
+
     cp "$APP_DIR/.env.example" "$APP_DIR/.env"
 
     if [[ -n "${TELEGRAM_BOT_TOKEN:-}" ]]; then
